@@ -7,7 +7,7 @@ const dbConnection = () => {
     console.log(`database connection: ${conn.connection.host}`);
   })
   .catch((err) => {
-    console.log(`fail: ${err.message}`);
+    console.error(`fail: ${err}`);
     process.exit(1);
   });
 };
