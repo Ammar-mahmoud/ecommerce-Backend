@@ -18,11 +18,18 @@ const {
 
 const router = express.Router();
 
-router.route("/").get(getCategoties).post(createCategoryValidator,createCategory);
+const subCategoryApi = require("./subCategoryApi");
+
+router.use('/:categoryId/subcategories', subCategoryApi);
+
+router
+  .route("/")
+  .get(getCategoties)
+  .post(createCategoryValidator, createCategory);
 router
   .route("/:id")
   .get(getCategoryValidator, getCategory)
-  .put(updateCategoryValidator,updateCategory)
-  .delete(deleteCategoryValidator,deleteCategory);
+  .put(updateCategoryValidator, updateCategory)
+  .delete(deleteCategoryValidator, deleteCategory);
 
 module.exports = router;

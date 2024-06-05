@@ -17,7 +17,6 @@ exports.getCategoties = asyncHandler(async (req, res) => {
 // specific category
 
 exports.getCategory = asyncHandler(async (req, res, next) => {
-  console.log("ammar");
   const { id } = req.params;
   const category = await CategoryModel.findById(id);
   if (!category) {

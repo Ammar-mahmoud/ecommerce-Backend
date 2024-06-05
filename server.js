@@ -5,6 +5,7 @@ dotenv.config({ path: "config.env" });
 const morgan = require("morgan");
 const dbConnection = require('./config/database');
 const categoryRoute = require('./api/categoryApi');
+const brandRoute = require('./api/brandApi');
 const ApiError = require('./utils/api_error')
 const globalError = require('./middlewares/error_middleware');
 const subCategoryRoute = require('./api/subCategoryApi')
@@ -28,8 +29,9 @@ if (process.env.NODE_ENV === "development") {
 
 // Routes
 
-app.use('/api/v1/categories', categoryRoute);
 app.use('/api/v1/subcategories', subCategoryRoute);
+app.use('/api/v1/categories', categoryRoute);
+app.use('/api/v1/brands', brandRoute);
 app.all("*", (req, res, next) => {
   // create error and send it to error handling middleware
   next(new ApiError(`can't find this end point: ${req.originalUrl}`, 400));
