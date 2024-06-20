@@ -1,24 +1,14 @@
-const slugify = require("slugify"); // ammar mahmoud --> ammar-mahmoud
-const asyncHandler = require("express-async-handler");
-const subCategoryModel = require("../models/sub_category");
-const ApiError = require("../utils/api_error");
+const factory = require('./handlersFactory');
+const SubCategory = require('../models/sub_category');
 
 exports.setCategoryIdToBody = (req, res, next) => {
-  // Nested route
+  // Nested route (Create)
   if (!req.body.category) req.body.category = req.params.categoryId;
   next();
 };
 
-exports.createSubCategory = asyncHandler(async (req, res) => {
-  const { name, category } = req.body;
-  const subCategory = await subCategoryModel.create({
-    name,
-    slug: slugify(name),
-    category,
-  });
-  res.status(201).json({ data: subCategory });
-});
-
+// Nested route
+// GET /api/v1/categories/:categoryId/subcategories
 exports.createFilterObj = (req, res, next) => {
   let filterObject = {};
   if (req.params.categoryId) filterObject = { category: req.params.categoryId };
@@ -26,58 +16,27 @@ exports.createFilterObj = (req, res, next) => {
   next();
 };
 
-exports.getSubCategoties = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
-  const skip = (page - 1) * limit;
+// @desc    Get list of subcategories
+// @route   GET /api/v1/subcategories
+// @access  Public
+exports.getSubCategories = factory.getAll(SubCategory);
 
-  const subCategories = await subCategoryModel.find(req.filterObj)
-  .skip(skip)
-  .limit(limit);
-// .populate({ path: 'category', select: 'name -_id' });
+// @desc    Get specific subcategory by id
+// @route   GET /api/v1/subcategories/:id
+// @access  Public
+exports.getSubCategory = factory.getOne(SubCategory);
 
-res
-  .status(200)
-  .json({ results: subCategories.length, page, data: subCategories });
-});
+// @desc    Create subCategory
+// @route   POST  /api/v1/subcategories
+// @access  Private
+exports.createSubCategory = factory.createOne(SubCategory);
 
-// specific subcategory
+// @desc    Update specific subcategory
+// @route   PUT /api/v1/subcategories/:id
+// @access  Private
+exports.updateSubCategory = factory.updateOne(SubCategory);
 
-exports.getSubCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const subcategory = await subCategoryModel.findById(id);
-  // .populate({ path: "category", select: "name -_id" });
-  if (!subcategory) {
-    //res.status(404).json({message:`No category for ${id}`});
-    return next(new ApiError(`No category for ${id}`, 404));
-  }
-  res.status(200).json({ data: subcategory });
-});
-
-exports.updateSubcategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const { name, category } = req.body;
-
-  const subcategory = await subCategoryModel.findOneAndUpdate(
-    { _id: id },
-    { name, slug: slugify(name), category: category },
-    { new: true }
-  );
-  if (!subcategory) {
-    //res.status(404).json({message:`No subcategory for ${id}`});
-    return next(new ApiError(`No category for ${id}`, 404));
-  }
-  res.status(200).json({ data: subcategory });
-});
-
-// Delete specific category
-
-exports.deleteSubcategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const subcategory = await subCategoryModel.findByIdAndDelete(id);
-  if (!subcategory) {
-    //res.status(404).json({message:`No subcategory for ${id}`});
-    return next(new ApiError(`No category for ${id}`, 404));
-  }
-  res.status(204).send();
-});
+// @desc    Delete specific subCategory
+// @route   DELETE /api/v1/subcategories/:id
+// @access  Private
+exports.deleteSubCategory = factory.deleteOne(SubCategory);
