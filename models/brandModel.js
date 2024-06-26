@@ -19,6 +19,24 @@ const brandSchema = new mongoose.Schema({
 },
 {timestamps: true} // two fields created at , updated at lasts updated
 );
+
+const setImageName = (doc)=>{
+    if(doc.image){
+        const imageUrl = `${process.env.BASE_URL}/brands/${doc.image}`;
+        doc.image = imageUrl;
+    }
+}
+
+// create
+brandSchema.post('save', (doc)=>{
+    setImageName(doc);
+})
+
+
+// find all categories, find one , update
+brandSchema.post('init', (doc)=>{
+    setImageName(doc)
+})
   
 const brandModel = mongoose.model("Brand", brandSchema);
   
