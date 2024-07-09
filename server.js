@@ -11,6 +11,8 @@ const ApiError = require('./utils/api_error')
 const globalError = require('./middlewares/error_middleware');
 const subCategoryRoute = require('./api/subCategoryApi')
 const productRoute = require('./api/productApi')
+const userRoute = require('./api/userApi')
+const authRoute = require('./api/authApi')
 //db connection
 
 dbConnection();
@@ -37,6 +39,8 @@ app.use('/api/v1/subcategories', subCategoryRoute);
 app.use('/api/v1/categories', categoryRoute);
 app.use('/api/v1/brands', brandRoute);
 app.use('/api/v1/products', productRoute);
+app.use('/api/v1/users', userRoute);
+app.use('/api/v1/auth', authRoute);
 app.all("*", (req, res, next) => {
   // create error and send it to error handling middleware
   next(new ApiError(`can't find this end point: ${req.originalUrl}`, 400));
