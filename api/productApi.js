@@ -17,10 +17,12 @@ const {
   uploadProductImages,
   resizeProductImages,
 } = require("../services/productService");
+const reviewsRoute = require('./reviewApi');
 
 const router = express.Router();
 const authService = require("../services/authService");
 
+router.use('/:productId/reviews', reviewsRoute);
 router
   .route("/")
   .get(getProducts)
