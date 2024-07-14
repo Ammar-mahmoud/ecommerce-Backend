@@ -5,18 +5,10 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "config.env" });
 const morgan = require("morgan");
 const dbConnection = require('./config/database');
-const categoryRoute = require('./api/categoryApi');
-const brandRoute = require('./api/brandApi');
 const ApiError = require('./utils/api_error')
 const globalError = require('./middlewares/error_middleware');
-const subCategoryRoute = require('./api/subCategoryApi')
-const productRoute = require('./api/productApi')
-const userRoute = require('./api/userApi')
-const authRoute = require('./api/authApi')
-const reviewRoute = require('./api/reviewApi')
-const wishlistRoute = require('./api/wishlistApi')
-const addressRoute = require('./api/addressApi')
 //db connection
+const mountRouts = require('./api');
 
 dbConnection();
 
@@ -35,18 +27,9 @@ if (process.env.NODE_ENV === "development") {
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
-
 // Routes
+mountRouts(app);
 
-app.use('/api/v1/subcategories', subCategoryRoute);
-app.use('/api/v1/categories', categoryRoute);
-app.use('/api/v1/brands', brandRoute);
-app.use('/api/v1/products', productRoute);
-app.use('/api/v1/users', userRoute);
-app.use('/api/v1/auth', authRoute);
-app.use('/api/v1/reviews', reviewRoute);
-app.use('/api/v1/wishlists', wishlistRoute);
-app.use('/api/v1/address', addressRoute);
 app.all("*", (req, res, next) => {
   // create error and send it to error handling middleware
   next(new ApiError(`can't find this end point: ${req.originalUrl}`, 400));
