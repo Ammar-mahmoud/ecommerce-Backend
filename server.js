@@ -2,8 +2,10 @@ const path = require('path');
 const express = require("express");
 const dotenv = require("dotenv");
 
-const cors = require('cors')
 const compression = require('compression');
+const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
+const mongoSanitize = require('express-mongo-sanitize');
 
 dotenv.config({ path: "config.env" });
 const morgan = require("morgan");
@@ -20,15 +22,11 @@ dbConnection();
 // express app
 const app = express();
 
-//enable other domains to access my app
-app.use(cors());
-app.options('*', cors());
- 
 // we want to compress all responses
 app.use(compression());
 
 // Middlewares
-app.use(express.json());
+app.use(express.json({limit: '20kb'})); // limit response size
 
 app.use(express.static(path.join(__dirname, 'uploads')))
 
@@ -37,6 +35,19 @@ if (process.env.NODE_ENV === "development") {
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
+// middleware to protect against HTTP Parameter Pollution attacks
+app.use(hpp({whitelist: ['price', 'sold', 'quantity']}));
+
+//to avoid brute-force attacks
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message:
+    'Too many accounts created from this ip, please try again later.',
+})
+
+app.use(limiter);
+app.use(mongoSanitize());
 // Routes
 mountRouts(app);
 
